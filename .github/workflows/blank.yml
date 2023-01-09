@@ -9,11 +9,6 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:
-    secrets:
-      access-token:
-        description: 'A token passed from the caller workflow'
-        required: false
     
 
   # Allows you to run this workflow manually from the Actions tab
