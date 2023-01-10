@@ -7,7 +7,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-     WEBHOOK_TOKEN:
+      WEBHOOK_URL:
+        description: 'Webhook URL'
+        required: true
+      WEBHOOK_METHOD:
+        description: 'Webhook method'
+        required: true
+        default: 'GET'
+      WEBHOOK_TOKEN:
         description: 'Webhook token'
         required: true
   
@@ -19,21 +26,29 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     env:
+      WEBHOOK_URL: ${{ github.event.inputs.WEBHOOK_URL }}
+      WEBHOOK_METHOD: ${{ github.event.inputs.WEBHOOK_METHOD }}
       WEBHOOK_TOKEN: ${{ github.event.inputs.WEBHOOK_TOKEN }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+      
+      - name: Notify job start
+        run: |
+          curl -s -o /dev/null -w "%{http_code}\n" \
+            -X "$WEBHOOK_METHOD" "$WEBHOOK_URL" \
+            -H "Authorization: Bearer $WEBHOOK_TOKEN"
 
       # Runs a single command using the runners shell
-      - name: sets-a-secret
-        run: |
-          echo Hello, world!
-          echo "my secret is...${{ github.event.inputs.WEBHOOK_TOKEN }}"
+#       - name: sets-a-secret
+#         run: |
+#           echo Hello, world!
+#           echo "my secret is...${{ github.event.inputs.WEBHOOK_TOKEN }}"
 
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+#       - name: Run a multi-line script
+#         run: |
+#           echo Add other actions to build,
+#           echo test, and deploy your project.
